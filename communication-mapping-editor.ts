@@ -16,11 +16,8 @@ import {
   svgNs,
   xlinkNs,
 } from './foundation/sldUtil.js';
-
-export interface IED {
-  element: Element;
-  name: string;
-}
+import { svgConnectionGenerator } from './foundation/paths.js';
+import { IED, Connection } from './foundation/types.js';
 
 @customElement('communication-mapping-editor')
 export class CommunicationMappingEditor extends LitElement {
@@ -65,6 +62,9 @@ export class CommunicationMappingEditor extends LitElement {
   get idle(): boolean {
     return !(this.placing || this.placingLabel);
   }
+
+  @state()
+  links: Connection[] = [];
 
   @query('svg#sldContainer')
   sld!: SVGGraphicsElement;
@@ -234,9 +234,6 @@ export class CommunicationMappingEditor extends LitElement {
     height="${1 * this.gridSize}"
     stroke-width="0.06"
     fill="none">
-    @key-down="${({ key }: KeyboardEvent) => {
-      if (key === 'Escape') this.reset();
-    }}"
     <g class="ied"
       id="#${ied.name}"
       transform="translate(${0} ${0})">
@@ -272,6 +269,8 @@ export class CommunicationMappingEditor extends LitElement {
         }} />`
         : nothing;
 
+    const svgConnection = svgConnectionGenerator(this.substation, this.links);
+
     return html`<div id="container">
       <svg
         xmlns="${svgNs}"
@@ -294,6 +293,7 @@ export class CommunicationMappingEditor extends LitElement {
         ${this.ieds.map(ied => this.renderIED(ied))}
         ${this.ieds.map(ied => this.renderLabel(ied.element))}
         ${placingLabelTarget} ${iedPlacingTarget}
+        ${this.links.map(link => svgConnection(link))}
       </svg>
     </div>`;
   }
@@ -319,6 +319,11 @@ export class CommunicationMappingEditor extends LitElement {
 
     g.label:not(.ied) {
       opacity: 0.2;
+    }
+
+    svg.connection:hover > path {
+      stroke: black;
+      stroke-width: 0.12;
     }
   `;
 }

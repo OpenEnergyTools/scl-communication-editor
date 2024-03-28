@@ -590,3 +590,595 @@ export const scd = `<?xml version="1.0" encoding="UTF-8"?>
 	<IED name="IED4" esld:x="4" esld:y="11" esld:lx="5" esld:ly="12" />
 	<IED name="IED5" esld:x="19" esld:y="11" esld:lx="20" esld:ly="12" />
 </SCL>`;
+
+export const rpScd = `<?xml version="1.0" encoding="UTF-8"?>
+<SCL xmlns="http://www.iec.ch/61850/2003/SCL" version="2007" revision="B" release="4" xmlns:esld="https://transpower.co.nz/SCL/SSD/SLD/v0">
+	<Header id="scd"/>
+    <Substation name="AA1" esld:w="35" esld:h="25">
+        <VoltageLevel name="E1" esld:x="1" esld:y="1" esld:lx="1" esld:ly="1" esld:w="25" esld:h="17">
+            <Bay name="B6" esld:x="18" esld:y="10" esld:lx="18" esld:ly="10" esld:w="7" esld:h="7"/><Bay name="B5" esld:x="10" esld:y="10" esld:lx="10" esld:ly="10.5" esld:w="7" esld:h="7"/><Bay name="B4" esld:x="2" esld:y="10" esld:lx="2" esld:ly="10.5" esld:w="7" esld:h="7"/><Bay name="B3" esld:x="18" esld:y="2" esld:lx="18" esld:ly="2.5" esld:w="7" esld:h="7"/><Bay name="B2" esld:x="10" esld:y="2" esld:lx="10" esld:ly="2.5" esld:w="7" esld:h="7"/><Bay name="B1" esld:x="2" esld:y="2" esld:lx="2" esld:ly="2.5" esld:w="7" esld:h="7"/>
+        </VoltageLevel>
+    </Substation>
+	<IED name="t1" esld:x="5" esld:y="5" esld:lx="6" esld:ly="6">
+        <AccessPoint name="AP1">
+            <LN lnClass="IHMI" inst="1"/>
+        </AccessPoint>
+    </IED>
+	<IED name="s11" esld:x="3" esld:y="5" esld:lx="2" esld:ly="6">
+        <AccessPoint name="AP1">
+            <Server>
+                <LDevice inst="lDevice">
+                    <LN0 lnClass="LLN0" inst="">
+                        <ReportControl name="rp1">
+                            <RptEnabled>
+                                <ClientLN iedName="t1"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp2">
+                            <RptEnabled>
+                                <ClientLN iedName="t1"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp3">
+                            <RptEnabled>
+                                <ClientLN iedName="t1"/>
+                            </RptEnabled>
+                        </ReportControl>
+                    </LN0>
+                </LDevice>
+            </Server>
+        </AccessPoint>
+    </IED>
+	<IED name="s12" esld:x="7" esld:y="5" esld:lx="8" esld:ly="6">
+        <AccessPoint name="AP1">
+            <Server>
+                <LDevice inst="lDevice">
+                    <LN0 lnClass="LLN0" inst="">
+                        <ReportControl name="rp1">
+                            <RptEnabled>
+                                <ClientLN iedName="t1"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp2">
+                            <RptEnabled>
+                                <ClientLN iedName="t1"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp3">
+                            <RptEnabled>
+                                <ClientLN iedName="t1"/>
+                            </RptEnabled>
+                        </ReportControl>
+                    </LN0>
+                </LDevice>
+            </Server>
+        </AccessPoint>
+    </IED>
+	<IED name="s13" esld:x="5" esld:y="8" esld:lx="6" esld:ly="9">
+        <AccessPoint name="AP1">
+            <Server>
+                <LDevice inst="lDevice">
+                    <LN0 lnClass="LLN0" inst="">
+                        <ReportControl name="rp1">
+                            <RptEnabled>
+                                <ClientLN iedName="t1"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp2">
+                            <RptEnabled>
+                                <ClientLN iedName="t1"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp3">
+                            <RptEnabled>
+                                <ClientLN iedName="t1"/>
+                            </RptEnabled>
+                        </ReportControl>
+                    </LN0>
+                </LDevice>
+            </Server>
+        </AccessPoint>
+    </IED>
+	<IED name="s14" esld:x="5" esld:y="2" esld:lx="6" esld:ly="3">
+        <AccessPoint name="AP1">
+            <Server>
+                <LDevice inst="lDevice">
+                    <LN0 lnClass="LLN0" inst="">
+                        <ReportControl name="rp1">
+                            <RptEnabled>
+                                <ClientLN iedName="t1"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp2">
+                            <RptEnabled>
+                                <ClientLN iedName="t1"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp3">
+                            <RptEnabled>
+                                <ClientLN iedName="t1"/>
+                            </RptEnabled>
+                        </ReportControl>
+                    </LN0>
+                </LDevice>
+            </Server>
+        </AccessPoint>
+    </IED>
+    <IED name="t2" esld:x="13" esld:y="5" esld:lx="14" esld:ly="6">
+        <AccessPoint name="AP1">
+            <LN lnClass="IHMI" inst="1"/>
+        </AccessPoint>
+    </IED>
+	<IED name="s21" esld:x="13" esld:y="2" esld:lx="14" esld:ly="3">
+        <AccessPoint name="AP1">
+            <Server>
+                <LDevice inst="lDevice">
+                    <LN0 lnClass="LLN0" inst="">
+                        <ReportControl name="rp1">
+                            <RptEnabled>
+                                <ClientLN iedName="t2"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp2">
+                            <RptEnabled>
+                                <ClientLN iedName="t2"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp3">
+                            <RptEnabled>
+                                <ClientLN iedName="t2"/>
+                            </RptEnabled>
+                        </ReportControl>
+                    </LN0>
+                </LDevice>
+            </Server>
+        </AccessPoint>
+    </IED>
+    <IED name="s22" esld:x="14" esld:y="7" esld:lx="15" esld:ly="8">
+        <AccessPoint name="AP1">
+            <Server>
+                <LDevice inst="lDevice">
+                    <LN0 lnClass="LLN0" inst="">
+                        <ReportControl name="rp1">
+                            <RptEnabled>
+                                <ClientLN iedName="t2"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp2">
+                            <RptEnabled>
+                                <ClientLN iedName="t2"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp3">
+                            <RptEnabled>
+                                <ClientLN iedName="t2"/>
+                            </RptEnabled>
+                        </ReportControl>
+                    </LN0>
+                </LDevice>
+            </Server>
+        </AccessPoint>
+    </IED>
+    <IED name="s23" esld:x="10" esld:y="8" esld:lx="11" esld:ly="9">
+        <AccessPoint name="AP1">
+            <Server>
+                <LDevice inst="lDevice">
+                    <LN0 lnClass="LLN0" inst="">
+                        <ReportControl name="rp1">
+                            <RptEnabled>
+                                <ClientLN iedName="t2"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp2">
+                            <RptEnabled>
+                                <ClientLN iedName="t2"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp3">
+                            <RptEnabled>
+                                <ClientLN iedName="t2"/>
+                            </RptEnabled>
+                        </ReportControl>
+                    </LN0>
+                </LDevice>
+            </Server>
+        </AccessPoint>
+    </IED>
+    <IED name="s24" esld:x="13" esld:y="8" esld:lx="14" esld:ly="9">
+        <AccessPoint name="AP1">
+            <Server>
+                <LDevice inst="lDevice">
+                    <LN0 lnClass="LLN0" inst="">
+                        <ReportControl name="rp1">
+                            <RptEnabled>
+                                <ClientLN iedName="t2"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp2">
+                            <RptEnabled>
+                                <ClientLN iedName="t2"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp3">
+                            <RptEnabled>
+                                <ClientLN iedName="t2"/>
+                            </RptEnabled>
+                        </ReportControl>
+                    </LN0>
+                </LDevice>
+            </Server>
+        </AccessPoint>
+    </IED>
+    <IED name="t3" esld:x="21" esld:y="5" esld:lx="21.5" esld:ly="7">
+        <AccessPoint name="AP1">
+            <LN lnClass="IHMI" inst="1"/>
+        </AccessPoint>
+    </IED>
+	<IED name="s31" esld:x="24" esld:y="4" esld:lx="24" esld:ly="4.5">
+        <AccessPoint name="AP1">
+            <Server>
+                <LDevice inst="lDevice">
+                    <LN0 lnClass="LLN0" inst="">
+                        <ReportControl name="rp1">
+                            <RptEnabled>
+                                <ClientLN iedName="t3"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp2">
+                            <RptEnabled>
+                                <ClientLN iedName="t3"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp3">
+                            <RptEnabled>
+                                <ClientLN iedName="t3"/>
+                            </RptEnabled>
+                        </ReportControl>
+                    </LN0>
+                </LDevice>
+            </Server>
+        </AccessPoint>
+    </IED>
+    <IED name="s32" esld:x="19" esld:y="6" esld:lx="19" esld:ly="8">
+        <AccessPoint name="AP1">
+            <Server>
+                <LDevice inst="lDevice">
+                    <LN0 lnClass="LLN0" inst="">
+                        <ReportControl name="rp1">
+                            <RptEnabled>
+                                <ClientLN iedName="t3"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp2">
+                            <RptEnabled>
+                                <ClientLN iedName="t3"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp3">
+                            <RptEnabled>
+                                <ClientLN iedName="t3"/>
+                            </RptEnabled>
+                        </ReportControl>
+                    </LN0>
+                </LDevice>
+            </Server>
+        </AccessPoint>
+    </IED>
+    <IED name="s33" esld:x="23" esld:y="6" esld:lx="23" esld:ly="8">
+        <AccessPoint name="AP1">
+            <Server>
+                <LDevice inst="lDevice">
+                    <LN0 lnClass="LLN0" inst="">
+                        <ReportControl name="rp1">
+                            <RptEnabled>
+                                <ClientLN iedName="t3"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp2">
+                            <RptEnabled>
+                                <ClientLN iedName="t3"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp3">
+                            <RptEnabled>
+                                <ClientLN iedName="t3"/>
+                            </RptEnabled>
+                        </ReportControl>
+                    </LN0>
+                </LDevice>
+            </Server>
+        </AccessPoint>
+    </IED>
+    <IED name="s34" esld:x="20" esld:y="4" esld:lx="20" esld:ly="4.5">
+        <AccessPoint name="AP1">
+            <Server>
+                <LDevice inst="lDevice">
+                    <LN0 lnClass="LLN0" inst="">
+                        <ReportControl name="rp1">
+                            <RptEnabled>
+                                <ClientLN iedName="t3"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp2">
+                            <RptEnabled>
+                                <ClientLN iedName="t3"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp3">
+                            <RptEnabled>
+                                <ClientLN iedName="t3"/>
+                            </RptEnabled>
+                        </ReportControl>
+                    </LN0>
+                </LDevice>
+            </Server>
+        </AccessPoint>
+    </IED>
+    <IED name="t4" esld:x="5" esld:y="13" esld:lx="6" esld:ly="14">
+        <AccessPoint name="AP1">
+            <LN lnClass="IHMI" inst="1"/>
+        </AccessPoint>
+    </IED>
+	<IED name="s41" esld:x="5" esld:y="12" esld:lx="5" esld:ly="12.5">
+        <AccessPoint name="AP1">
+            <Server>
+                <LDevice inst="lDevice">
+                    <LN0 lnClass="LLN0" inst="">
+                        <ReportControl name="rp1">
+                            <RptEnabled>
+                                <ClientLN iedName="t4"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp2">
+                            <RptEnabled>
+                                <ClientLN iedName="t4"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp3">
+                            <RptEnabled>
+                                <ClientLN iedName="t4"/>
+                            </RptEnabled>
+                        </ReportControl>
+                    </LN0>
+                </LDevice>
+            </Server>
+        </AccessPoint>
+    </IED>
+    <IED name="s42" esld:x="5" esld:y="14" esld:lx="5" esld:ly="16">
+        <AccessPoint name="AP1">
+            <Server>
+                <LDevice inst="lDevice">
+                    <LN0 lnClass="LLN0" inst="">
+                        <ReportControl name="rp1">
+                            <RptEnabled>
+                                <ClientLN iedName="t4"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp2">
+                            <RptEnabled>
+                                <ClientLN iedName="t4"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp3">
+                            <RptEnabled>
+                                <ClientLN iedName="t4"/>
+                            </RptEnabled>
+                        </ReportControl>
+                    </LN0>
+                </LDevice>
+            </Server>
+        </AccessPoint>
+    </IED>
+    <IED name="t5" esld:x="13" esld:y="13" esld:lx="14" esld:ly="14">
+        <AccessPoint name="AP1">
+            <LN lnClass="IHMI" inst="1"/>
+        </AccessPoint>
+    </IED>
+	<IED name="s51" esld:x="16" esld:y="10" esld:lx="16" esld:ly="10.5">
+        <AccessPoint name="AP1">
+            <Server>
+                <LDevice inst="lDevice">
+                    <LN0 lnClass="LLN0" inst="">
+                        <ReportControl name="rp1">
+                            <RptEnabled>
+                                <ClientLN iedName="t5"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp2">
+                            <RptEnabled>
+                                <ClientLN iedName="t5"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp3">
+                            <RptEnabled>
+                                <ClientLN iedName="t5"/>
+                            </RptEnabled>
+                        </ReportControl>
+                    </LN0>
+                </LDevice>
+            </Server>
+        </AccessPoint>
+    </IED>
+    <IED name="s52" esld:x="13" esld:y="16" esld:lx="12" esld:ly="17">
+        <AccessPoint name="AP1">
+            <Server>
+                <LDevice inst="lDevice">
+                    <LN0 lnClass="LLN0" inst="">
+                        <ReportControl name="rp1">
+                            <RptEnabled>
+                                <ClientLN iedName="t5"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp2">
+                            <RptEnabled>
+                                <ClientLN iedName="t5"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp3">
+                            <RptEnabled>
+                                <ClientLN iedName="t5"/>
+                            </RptEnabled>
+                        </ReportControl>
+                    </LN0>
+                </LDevice>
+            </Server>
+        </AccessPoint>
+    </IED>
+    <IED name="s53" esld:x="15" esld:y="15" esld:lx="15" esld:ly="17">
+        <AccessPoint name="AP1">
+            <Server>
+                <LDevice inst="lDevice">
+                    <LN0 lnClass="LLN0" inst="">
+                        <ReportControl name="rp1">
+                            <RptEnabled>
+                                <ClientLN iedName="t5"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp2">
+                            <RptEnabled>
+                                <ClientLN iedName="t5"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp3">
+                            <RptEnabled>
+                                <ClientLN iedName="t5"/>
+                            </RptEnabled>
+                        </ReportControl>
+                    </LN0>
+                </LDevice>
+            </Server>
+        </AccessPoint>
+    </IED>
+    <IED name="s54" esld:x="14" esld:y="11" esld:lx="14" esld:ly="11.5">
+        <AccessPoint name="AP1">
+            <Server>
+                <LDevice inst="lDevice">
+                    <LN0 lnClass="LLN0" inst="">
+                        <ReportControl name="rp1">
+                            <RptEnabled>
+                                <ClientLN iedName="t5"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp2">
+                            <RptEnabled>
+                                <ClientLN iedName="t5"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp3">
+                            <RptEnabled>
+                                <ClientLN iedName="t5"/>
+                            </RptEnabled>
+                        </ReportControl>
+                    </LN0>
+                </LDevice>
+            </Server>
+        </AccessPoint>
+    </IED>
+    <IED name="t6" esld:x="21" esld:y="13" esld:lx="22" esld:ly="14">
+        <AccessPoint name="AP1">
+            <LN lnClass="IHMI" inst="1"/>
+        </AccessPoint>
+    </IED>
+	<IED name="s61" esld:x="20" esld:y="10" esld:lx="19" esld:ly="11">
+        <AccessPoint name="AP1">
+            <Server>
+                <LDevice inst="lDevice">
+                    <LN0 lnClass="LLN0" inst="">
+                        <ReportControl name="rp1">
+                            <RptEnabled>
+                                <ClientLN iedName="t6"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp2">
+                            <RptEnabled>
+                                <ClientLN iedName="t6"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp3">
+                            <RptEnabled>
+                                <ClientLN iedName="t6"/>
+                            </RptEnabled>
+                        </ReportControl>
+                    </LN0>
+                </LDevice>
+            </Server>
+        </AccessPoint>
+    </IED>
+    <IED name="s62" esld:x="21" esld:y="10" esld:lx="22" esld:ly="11">
+        <AccessPoint name="AP1">
+            <Server>
+                <LDevice inst="lDevice">
+                    <LN0 lnClass="LLN0" inst="">
+                        <ReportControl name="rp1">
+                            <RptEnabled>
+                                <ClientLN iedName="t6"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp2">
+                            <RptEnabled>
+                                <ClientLN iedName="t6"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp3">
+                            <RptEnabled>
+                                <ClientLN iedName="t6"/>
+                            </RptEnabled>
+                        </ReportControl>
+                    </LN0>
+                </LDevice>
+            </Server>
+        </AccessPoint>
+    </IED>
+    <IED name="s63" esld:x="20" esld:y="15" esld:lx="20" esld:ly="17">
+        <AccessPoint name="AP1">
+            <Server>
+                <LDevice inst="lDevice">
+                    <LN0 lnClass="LLN0" inst="">
+                        <ReportControl name="rp1">
+                            <RptEnabled>
+                                <ClientLN iedName="t6"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp2">
+                            <RptEnabled>
+                                <ClientLN iedName="t6"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp3">
+                            <RptEnabled>
+                                <ClientLN iedName="t6"/>
+                            </RptEnabled>
+                        </ReportControl>
+                    </LN0>
+                </LDevice>
+            </Server>
+        </AccessPoint>
+    </IED>
+    <IED name="s64" esld:x="18" esld:y="11" esld:lx="18" esld:ly="11.5">
+        <AccessPoint name="AP1">
+            <Server>
+                <LDevice inst="lDevice">
+                    <LN0 lnClass="LLN0" inst="">
+                        <ReportControl name="rp1">
+                            <RptEnabled>
+                                <ClientLN iedName="t6"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp2">
+                            <RptEnabled>
+                                <ClientLN iedName="t6"/>
+                            </RptEnabled>
+                        </ReportControl>
+                        <ReportControl name="rp3">
+                            <RptEnabled>
+                                <ClientLN iedName="t6"/>
+                                <ClientLN iedName="t6"/>
+                                <ClientLN iedName="invalidIed"/>
+                            </RptEnabled>
+                        </ReportControl>
+                    </LN0>
+                </LDevice>
+            </Server>
+        </AccessPoint>
+    </IED>
+</SCL>`;

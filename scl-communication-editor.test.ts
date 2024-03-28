@@ -4,7 +4,7 @@ import { sendMouse, setViewport } from '@web/test-runner-commands';
 
 import { visualDiff } from '@web/test-runner-visual-regression';
 
-import { scd, ssd } from './testfiles.js';
+import { rpScd, scd, ssd } from './testfiles.js';
 
 import SlcCommunicationEditor from './scl-communication-editor.js';
 
@@ -20,6 +20,7 @@ customElements.define('scl-communication-editor', SlcCommunicationEditor);
 
 const pureSSD = new DOMParser().parseFromString(ssd, 'application/xml');
 const docWithIED = new DOMParser().parseFromString(scd, 'application/xml');
+const docRp = new DOMParser().parseFromString(rpScd, 'application/xml');
 
 describe('scl-communication-editor', () => {
   let div: HTMLDivElement;
@@ -77,7 +78,7 @@ describe('scl-communication-editor', () => {
     });
   });
 
-  describe('without pure SCD loaded', () => {
+  describe('with pure SCD loaded', () => {
     let editor: SlcCommunicationEditor;
     beforeEach(async () => {
       editor = await fixture(
@@ -172,6 +173,63 @@ describe('scl-communication-editor', () => {
       await timeout(300);
 
       await visualDiff(editor, `#9 release selected IED label`);
+    });
+  });
+
+  describe('with report control type SCD loaded', () => {
+    describe('without any interaction', () => {
+      let editor: SlcCommunicationEditor;
+      beforeEach(async () => {
+        editor = await fixture(
+          html`<scl-communication-editor
+            .doc=${docRp}
+          ></scl-communication-editor>`
+        );
+        div.prepend(editor);
+
+        await setViewport({ width: 1200, height: 800 });
+      });
+
+      afterEach(async () => {
+        editor.remove();
+      });
+
+      it('per default looks like the latest snapshot', async () => {
+        await editor.updateComplete;
+        await timeout(200);
+        await visualDiff(editor, `#10 report control type connection`);
+      });
+    });
+
+    describe('with move hover over connection', () => {
+      let editor: SlcCommunicationEditor;
+      beforeEach(async () => {
+        editor = await fixture(
+          html`<scl-communication-editor
+            .doc=${docRp}
+          ></scl-communication-editor>`
+        );
+        div.prepend(editor);
+
+        await setViewport({ width: 1200, height: 800 });
+      });
+
+      afterEach(async () => {
+        editor.remove();
+      });
+
+      it('per default looks like the latest snapshot', async () => {
+        await editor.updateComplete;
+
+        await sendMouse({ type: 'move', position: [241, 153] });
+
+        await timeout(200);
+
+        await visualDiff(
+          editor,
+          `#11 report control type connection highlight on hover`
+        );
+      });
     });
   });
 });
