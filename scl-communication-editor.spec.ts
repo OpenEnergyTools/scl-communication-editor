@@ -31,6 +31,8 @@ describe('scl-communication-editor', () => {
     );
 
     document.body.append(editor);
+
+    await sendMouse({ type: 'click', position: [550, 24] });
   });
 
   afterEach(() => editor.remove());

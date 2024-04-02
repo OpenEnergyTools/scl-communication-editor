@@ -3,6 +3,8 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 
 import '@material/mwc-icon-button';
+import '@material/mwc-icon-button-toggle';
+import type { IconButtonToggle } from '@material/mwc-icon-button-toggle';
 
 import { newEditEvent } from '@openscd/open-scd-core';
 
@@ -28,14 +30,8 @@ export class CommunicationMappingEditor extends LitElement {
   @property({ type: Number })
   gridSize!: number;
 
-  @property({ type: Boolean })
-  filterReport = false;
-
-  @property({ type: Boolean })
-  filterGOOSE = false;
-
-  @property({ type: Boolean })
-  filterSMV = false;
+  @property({ attribute: false })
+  links: Connection[] = [];
 
   @state()
   get ieds(): IED[] {
@@ -47,34 +43,38 @@ export class CommunicationMappingEditor extends LitElement {
     }));
   }
 
-  @property({ attribute: false })
-  placing?: Element;
+  @state() filterReport = false;
 
-  @property({ attribute: false })
-  placingLabel?: Element;
+  @state() filterGOOSE = false;
 
-  @property({ attribute: false })
-  placingOffset: Point = [0, 0];
+  @state() filterSMV = false;
 
-  @state()
-  mouseX = 0;
+  @state() selectedIed?: Element;
 
-  @state()
-  mouseY = 0;
+  @state() filterRcv = false;
 
-  @state()
-  mouseX2 = 0;
+  @state() filterSend = false;
 
-  @state()
-  mouseY2 = 0;
+  @state() editMode = false;
+
+  @state() placing?: Element;
+
+  @state() placingLabel?: Element;
+
+  @state() placingOffset: Point = [0, 0];
+
+  @state() mouseX = 0;
+
+  @state() mouseY = 0;
+
+  @state() mouseX2 = 0;
+
+  @state() mouseY2 = 0;
 
   @state()
   get idle(): boolean {
     return !(this.placing || this.placingLabel);
   }
-
-  @state()
-  links: Connection[] = [];
 
   @query('svg#sldContainer')
   sld!: SVGGraphicsElement;
@@ -176,6 +176,23 @@ export class CommunicationMappingEditor extends LitElement {
     }
   }
 
+  isConnectionFiltered(conn: Connection) {
+    if (!this.selectedIed) return true;
+
+    if (!this.filterRcv && this.filterSend)
+      return conn.target.ied === this.selectedIed;
+
+    if (this.filterRcv && !this.filterSend)
+      return conn.source.ied === this.selectedIed;
+
+    if (this.filterRcv && this.filterSend) return false;
+
+    return (
+      conn.source.ied === this.selectedIed ||
+      conn.target.ied === this.selectedIed
+    );
+  }
+
   constructor() {
     super();
 
@@ -217,7 +234,7 @@ export class CommunicationMappingEditor extends LitElement {
     const fontSize = 0.45;
     let events = 'none';
     let handleClick: (() => void) | symbol = nothing;
-    if (this.idle) {
+    if (this.idle && this.editMode) {
       events = 'all';
       const offset = [this.mouseX2 - x - 0.5, this.mouseY2 - y + 0.5] as Point;
       handleClick = () => this.startPlacingLabel(element, offset);
@@ -266,7 +283,13 @@ export class CommunicationMappingEditor extends LitElement {
                 pointer-events="none" />`;
 
     let handleClick: (() => void) | symbol = nothing;
-    if (this.idle) handleClick = () => this.startPlacing(ied.element);
+    if (this.idle && this.editMode)
+      handleClick = () => this.startPlacing(ied.element);
+    else if (!this.editMode)
+      handleClick = () => {
+        if (this.selectedIed !== ied.element) this.selectedIed = ied.element;
+        else this.selectedIed = undefined;
+      };
 
     return svg`<svg
     xmlns="${svgNs}"
@@ -327,6 +350,39 @@ export class CommunicationMappingEditor extends LitElement {
 
     return html`<div class="info-box">
       ${controlBlocks.map(controlBlock => this.renderService(controlBlock))}
+      ${this.selectedIed && !this.editMode
+        ? html`<svg viewBox="0 0 25 25" width="25" height="25">
+              <path d="M0,12.5L22,12.5" stroke-width="3" stroke="black" />
+              <path d="M25,12.5L12.5,18L12.5,7Z" stroke-width="1" />
+            </svg>
+            <input
+              type="checkbox"
+              checked
+              @click="${(evt: Event) => {
+                this.filterRcv = !(evt.target as HTMLInputElement).checked;
+              }}"
+            />
+            <svg viewBox="0 0 25 25" width="25" height="25">
+              <path d="M3,12.5L25,12.5" stroke-width="3" stroke="black" />
+              <path d="M0,12.5L12.5,18L12.5,7Z" stroke-width="1" />
+            </svg>
+            <input
+              type="checkbox"
+              checked
+              @click="${(evt: Event) => {
+                this.filterSend = !(evt.target as HTMLInputElement).checked;
+              }}"
+            />`
+        : nothing}
+      <mwc-icon-button-toggle
+        ?on=${this.editMode}
+        onIcon="edit"
+        offIcon="edit_off"
+        @click="${(evt: Event) => {
+          this.editMode = (evt.target as IconButtonToggle).on;
+          this.selectedIed = undefined;
+        }}"
+      ></mwc-icon-button-toggle>
       <mwc-icon-button
         class="zoom"
         icon="zoom_in"
@@ -408,7 +464,9 @@ export class CommunicationMappingEditor extends LitElement {
           ${this.ieds.map(ied => this.renderIED(ied))}
           ${this.ieds.map(ied => this.renderLabel(ied.element))}
           ${placingLabelTarget} ${iedPlacingTarget}
-          ${this.links.map(link => svgConnection(link))}
+          ${this.links
+            .filter(conn => this.isConnectionFiltered(conn))
+            .map(link => svgConnection(link))}
         </svg>
       </div>`;
   }
@@ -447,7 +505,7 @@ export class CommunicationMappingEditor extends LitElement {
     }
 
     .info-box > svg {
-      padding: 10px 20px 10px 20px;
+      padding-left: 15px;
     }
 
     .info-box > .serviceFilter > label {

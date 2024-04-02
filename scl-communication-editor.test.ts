@@ -91,7 +91,7 @@ describe('scl-communication-editor', () => {
     });
   });
 
-  describe('with pure SCD loaded', () => {
+  describe('in edit mode', () => {
     let editor: SlcCommunicationEditor;
     beforeEach(async () => {
       editor = await fixture(
@@ -102,6 +102,7 @@ describe('scl-communication-editor', () => {
       div.prepend(editor);
 
       await setViewport({ width: 800, height: 600 });
+      await sendMouse({ type: 'click', position: [550, 24] });
     });
 
     afterEach(async () => {
@@ -290,7 +291,7 @@ describe('scl-communication-editor', () => {
       it('per default looks like the latest snapshot', async () => {
         await editor.updateComplete;
 
-        await sendMouse({ type: 'click', position: [262, 25] });
+        await sendMouse({ type: 'click', position: [212, 25] });
 
         await timeout(200);
 
@@ -318,7 +319,7 @@ describe('scl-communication-editor', () => {
       it('per default looks like the latest snapshot', async () => {
         await editor.updateComplete;
 
-        await sendMouse({ type: 'click', position: [433, 25] });
+        await sendMouse({ type: 'click', position: [358, 25] });
 
         await timeout(200);
 
@@ -350,7 +351,7 @@ describe('scl-communication-editor', () => {
     it('on zoom in button click looks like the latest snapshot', async () => {
       await editor.updateComplete;
 
-      await sendMouse({ type: 'click', position: [625, 24] });
+      await sendMouse({ type: 'click', position: [600, 24] });
 
       await timeout(200);
       await visualDiff(editor, `#15 on zoom in button`);
@@ -359,7 +360,7 @@ describe('scl-communication-editor', () => {
     it('on zoom out button click looks like the latest snapshot', async () => {
       await editor.updateComplete;
 
-      await sendMouse({ type: 'click', position: [672, 24] });
+      await sendMouse({ type: 'click', position: [650, 24] });
 
       await timeout(200);
       await visualDiff(editor, `#16 on zoom out button`);
@@ -391,6 +392,73 @@ describe('scl-communication-editor', () => {
 
       await timeout(200);
       await visualDiff(editor, `#18 on wheel zoom out`);
+    });
+  });
+
+  describe('with selected IED', () => {
+    let editor: SlcCommunicationEditor;
+    beforeEach(async () => {
+      editor = await fixture(
+        html`<scl-communication-editor
+          .doc=${docComm}
+        ></scl-communication-editor>`
+      );
+      div.prepend(editor);
+
+      await setViewport({ width: 1200, height: 800 });
+
+      await sendMouse({ type: 'click', position: [172, 220] });
+    });
+
+    afterEach(async () => {
+      editor.remove();
+    });
+
+    it('per default looks like the latest snapshot', async () => {
+      await editor.updateComplete;
+      await timeout(200);
+      await visualDiff(editor, `#19 filter on IED select`);
+    });
+
+    it('with filtered receiving messages looks like the latest snapshot', async () => {
+      await editor.updateComplete;
+
+      await sendMouse({ type: 'click', position: [577, 24] });
+
+      await timeout(200);
+
+      await visualDiff(editor, `#20 filter receiving messages`);
+    });
+
+    it('with filtered sending messages looks like the latest snapshot', async () => {
+      await editor.updateComplete;
+
+      await sendMouse({ type: 'click', position: [638, 24] });
+
+      await timeout(200);
+
+      await visualDiff(editor, `#20 filter sending messages`);
+    });
+
+    it('with filtered sending and receiving messages looks like the latest snapshot', async () => {
+      await editor.updateComplete;
+
+      await sendMouse({ type: 'click', position: [577, 24] });
+      await sendMouse({ type: 'click', position: [638, 24] });
+
+      await timeout(200);
+
+      await visualDiff(editor, `#21 filter sending and receiving messages`);
+    });
+
+    it('with IEd unselcted looks like the latest snapshot', async () => {
+      await editor.updateComplete;
+
+      await sendMouse({ type: 'click', position: [172, 220] });
+
+      await timeout(200);
+
+      await visualDiff(editor, `#22 un done IED selection`);
     });
   });
 });
