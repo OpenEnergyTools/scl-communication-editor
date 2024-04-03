@@ -461,4 +461,31 @@ describe('scl-communication-editor', () => {
       await visualDiff(editor, `#22 un done IED selection`);
     });
   });
+
+  describe('allows to disable equipment labels', () => {
+    let editor: SlcCommunicationEditor;
+    beforeEach(async () => {
+      editor = await fixture(
+        html`<scl-communication-editor
+          .doc=${pureSSD}
+        ></scl-communication-editor>`
+      );
+      div.prepend(editor);
+
+      await setViewport({ width: 1400, height: 1000 });
+    });
+
+    afterEach(async () => {
+      editor.remove();
+    });
+
+    it('looks like the latest snapshot', async () => {
+      await editor.updateComplete;
+
+      await sendMouse({ type: 'click', position: [690, 24] });
+
+      await timeout(200);
+      await visualDiff(editor, `#23 allows to disable equipment labels`);
+    });
+  });
 });

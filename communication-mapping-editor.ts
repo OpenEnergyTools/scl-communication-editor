@@ -57,6 +57,8 @@ export class CommunicationMappingEditor extends LitElement {
 
   @state() editMode = false;
 
+  @state() showLabel = true;
+
   @state() placing?: Element;
 
   @state() placingLabel?: Element;
@@ -401,6 +403,14 @@ export class CommunicationMappingEditor extends LitElement {
         }}"
       >
       </mwc-icon-button>
+      <mwc-icon-button-toggle
+        ?on=${this.showLabel}
+        onIcon="font_download"
+        offIcon="font_download_off"
+        @click="${(evt: Event) => {
+          this.showLabel = (evt.target as IconButtonToggle).on;
+        }}"
+      ></mwc-icon-button-toggle>
     </div>`;
   }
 
@@ -442,6 +452,7 @@ export class CommunicationMappingEditor extends LitElement {
           ${this.filterSMV
             ? `svg.connection.SampledValueControl {display: none} `
             : nothing}
+          ${this.showLabel ? nothing : `.label:not(.ied) {display: none} `}
         </style>
         <svg
           xmlns="${svgNs}"
