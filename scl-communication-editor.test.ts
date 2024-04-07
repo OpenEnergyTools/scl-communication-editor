@@ -488,4 +488,46 @@ describe('scl-communication-editor', () => {
       await visualDiff(editor, `#23 allows to disable equipment labels`);
     });
   });
+
+  describe('has a remove connection dialog', () => {
+    describe('with connection click', () => {
+      let editor: SlcCommunicationEditor;
+      beforeEach(async () => {
+        editor = await fixture(
+          html`<scl-communication-editor
+            .doc=${docComm}
+          ></scl-communication-editor>`
+        );
+        div.prepend(editor);
+
+        await setViewport({ width: 1200, height: 800 });
+      });
+
+      afterEach(async () => {
+        editor.remove();
+      });
+
+      it('for ExtRef type inputs looks like the latest snapshot', async () => {
+        await editor.updateComplete;
+
+        await sendMouse({ type: 'click', position: [241, 198] });
+
+        await editor.updateComplete;
+        await timeout(200);
+
+        await visualDiff(editor, `#24 remove dialog for GOOSE connection`);
+      });
+
+      it('for ClientLNs type inputs looks like the latest snapshot', async () => {
+        await editor.updateComplete;
+
+        await sendMouse({ type: 'click', position: [473, 432] });
+
+        await editor.updateComplete;
+        await timeout(200);
+
+        await visualDiff(editor, `#25 remove dialog for Report connection`);
+      });
+    });
+  });
 });

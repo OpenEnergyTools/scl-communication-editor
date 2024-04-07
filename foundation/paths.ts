@@ -4,6 +4,7 @@ import { identity } from '@openenergytools/scl-lib';
 
 import { attributes } from './sldUtil.js';
 import { Connection } from './types.js';
+import { inputReference } from './utils.js';
 
 export const serviceColoring: Record<string, string> = {
   ReportControl: '#859900',
@@ -37,18 +38,7 @@ function tooltip(conn: Connection): string {
   const sourceIed = conn.source.ied.getAttribute('name');
   const targetIed = conn.target.ied.getAttribute('name');
 
-  const data = conn.target.inputs.map(input => {
-    if (input.tagName === 'ClientLN') return input.getAttribute('lnClass');
-
-    const ldInst = input.getAttribute('ldInst')!;
-    const prefix = input.getAttribute('prefix') ?? '';
-    const lnClass = input.getAttribute('lnClass');
-    const lnInst = input.getAttribute('lnInst') ?? '';
-    const doName = input.getAttribute('doName');
-    const daName = input.getAttribute('daName') ?? '';
-
-    return `${ldInst}/${prefix}${lnClass}${lnInst}.${doName}.${daName}`;
-  });
+  const data = conn.target.inputs.map(input => inputReference(input));
 
   return `${sourceIed}:${cbName} -> ${targetIed}
    
@@ -438,11 +428,19 @@ export function svgConnectionGenerator(
   return (conn: Connection) => {
     const [linkPath, arrowPath] = svgPath(conn, faceCount);
 
+    const event = new CustomEvent('select-connection', {
+      bubbles: true,
+      composed: true,
+      detail: conn,
+    });
+
     const color = serviceColoring[conn.source.controlBlock.tagName];
     return svg`<svg class="connection ${conn.source.controlBlock.tagName}"
           width="${w}"
           height="${h}">
-          <path d="${linkPath}" stroke="${color}" stroke-width="0.08"><title>${tooltip(
+          <path d="${linkPath}" stroke="${color}" stroke-width="0.08" @click="${(
+      evt: Event
+    ) => evt.target?.dispatchEvent(event)}"><title>${tooltip(
       conn
     )}</title></path>
           <path d="${arrowPath}" stroke="${color}" fill="${color}" stroke-width="0.08"/>

@@ -1,12 +1,28 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-return-assign */
-import { css, html, LitElement } from 'lit';
-import { property, state } from 'lit/decorators.js';
+import { css, html, LitElement, TemplateResult } from 'lit';
+import { property, query, state } from 'lit/decorators.js';
 
-import { identity } from '@openenergytools/scl-lib';
+import '@material/mwc-dialog';
+import '@material/mwc-button';
+import type { Dialog } from '@material/mwc-dialog';
+
+import { newEditEvent } from '@openscd/open-scd-core';
+
+import '@openenergytools/filterable-lists/dist/action-list.js';
+import type { ActionItem } from '@openenergytools/filterable-lists/dist/action-list.js';
+
+import { identity, unsubscribe } from '@openenergytools/scl-lib';
 
 import './communication-mapping-editor.js';
 
 import { Connection } from './foundation/types.js';
+import {
+  inputReference as inputReferenceHeadline,
+  inputSupportingText,
+} from './foundation/utils.js';
+
+type SelectConnectionEvent = CustomEvent<Connection>;
 
 function combineSelectors<T>(...selectors: T[][]): string {
   return selectors
@@ -118,7 +134,7 @@ function parseExtRefs(doc: XMLDocument): Connection[] {
           if (targetName && targetMap[targetName])
             targetMap[targetName].inputs.push(extRef);
           else if (targetName)
-            targetMap[targetName] = { ied: target!, inputs: [] };
+            targetMap[targetName] = { ied: target!, inputs: [extRef] };
         });
 
       return Object.values(targetMap).map(target => {
@@ -127,6 +143,13 @@ function parseExtRefs(doc: XMLDocument): Connection[] {
       });
     }
   );
+}
+
+function connectionHeading(conn: Connection): string {
+  const sourceIedName = conn.source.ied.getAttribute('name');
+  const cbName = conn.source.controlBlock.getAttribute('name');
+  const targetIedName = conn.target.ied.getAttribute('name');
+  return `${sourceIedName}:${cbName} ->${targetIedName}`;
 }
 
 export default class SlcCommunicationEditor extends LitElement {
@@ -144,6 +167,67 @@ export default class SlcCommunicationEditor extends LitElement {
   @property({ type: Number })
   editCount = -1;
 
+  @state()
+  selectedConnection?: Connection;
+
+  @query('mwc-dialog') removeSelection!: Dialog;
+
+  removeInputs(inputs: Element[]): void {
+    const removeClientLNs = inputs
+      .filter(input => input.tagName === 'ClientLN')
+      .map(clientLn => ({ node: clientLn }));
+
+    const removeExtRefs = unsubscribe(
+      inputs.filter(input => input.tagName === 'ExtRef')
+    );
+
+    const edits = [...removeClientLNs, ...removeExtRefs];
+
+    if (edits.length > 0) this.dispatchEvent(newEditEvent(edits));
+  }
+
+  removeAllInputs(): void {
+    const inputs = this.selectedConnection?.target.inputs ?? [];
+    this.removeInputs(inputs);
+
+    this.requestUpdate();
+  }
+
+  renderRemoveDialog(): TemplateResult {
+    const heading = this.selectedConnection
+      ? connectionHeading(this.selectedConnection)
+      : 'No connection selected';
+
+    const items: ActionItem[] = this.selectedConnection
+      ? this.selectedConnection.target.inputs.map(input => ({
+          headline: inputReferenceHeadline(input),
+          supportingText: inputSupportingText(input),
+        }))
+      : [];
+
+    const content = html`<action-list
+      filterable
+      .items=${items}
+    ></action-list>`;
+
+    return html`<mwc-dialog heading="${heading}"
+      >${content}
+      <mwc-button
+        slot="secondaryAction"
+        label="discard"
+        dialogAction="cancel"
+        style="--mdc-theme-primary: var(--oscd-error)"
+      ></mwc-button>
+      <mwc-button
+        slot="primaryAction"
+        label="remove all"
+        icon="link_off"
+        @click="${this.removeAllInputs}"
+        dialogAction="cancel"
+      ></mwc-button
+    ></mwc-dialog>`;
+  }
+
   render() {
     if (!this.substation) return html`<main>No substation section</main>`;
 
@@ -155,7 +239,12 @@ export default class SlcCommunicationEditor extends LitElement {
           ...clientLnConnections(this.substation.ownerDocument),
           ...parseExtRefs(this.substation.ownerDocument),
         ]}
+        @select-connection="${(evt: SelectConnectionEvent) => {
+          this.selectedConnection = evt.detail;
+          this.removeSelection.show();
+        }}"
       ></communication-mapping-editor>
+      ${this.renderRemoveDialog()}
     </main>`;
   }
 
@@ -163,6 +252,21 @@ export default class SlcCommunicationEditor extends LitElement {
     main {
       width: 100%;
       height: 100%;
+    }
+
+    * {
+      --md-sys-color-primary: var(--oscd-primary);
+      --md-sys-color-secondary: var(--oscd-secondary);
+      --md-sys-typescale-body-large-font: var(--oscd-theme-text-font);
+      --md-outlined-text-field-input-text-color: var(--oscd-base01);
+
+      --md-sys-color-surface: var(--oscd-base3);
+      --md-sys-color-on-surface: var(--oscd-base00);
+      --md-sys-color-on-primary: var(--oscd-base2);
+      --md-sys-color-on-surface-variant: var(--oscd-base00);
+      --md-menu-container-color: var(--oscd-base3);
+      font-family: var(--oscd-theme-text-font);
+      --md-sys-color-surface-container-highest: var(--oscd-base2);
     }
   `;
 }

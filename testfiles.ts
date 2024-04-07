@@ -611,7 +611,9 @@ export const commScd = `<?xml version="1.0" encoding="UTF-8"?>
                             <ExtRef iedName="s11" srcLDInst="lDevice" srcLNClass="LLN0" srcLNInst="" srcCBName="gse2"/>
                             <ExtRef iedName="s11" srcLDInst="lDevice" srcLNClass="LLN0" srcLNInst="" srcCBName="gse3"/>
                             <ExtRef iedName="s12" srcLDInst="lDevice" srcLNClass="LLN0" srcLNInst="" srcCBName="gse1"/>
-                            <ExtRef iedName="s12" srcLDInst="lDevice" srcLNClass="LLN0" srcLNInst="" srcCBName="gse2"/>
+                            <ExtRef iedName="s12" ldInst="lDevice" prefix="TC" lnClass="TCTR" lnInst="1" doName="AmpSv" daName="instMag.i" desc="desc" intAddr="intAddr" srcLDInst="lDevice" srcLNClass="LLN0" srcLNInst="" srcCBName="gse2"/>
+                            <ExtRef iedName="s12" ldInst="lDevice" prefix="TC" lnClass="TCTR" lnInst="1" doName="AmpSv" daName="q" desc="desc" srcLDInst="lDevice" srcLNClass="LLN0" srcLNInst="" srcCBName="gse2"/>
+                            <ExtRef iedName="s12" ldInst="lDevice" prefix="TC" lnClass="TCTR" lnInst="1" doName="AmpSv" daName="q" intAddr="intAddr" srcLDInst="lDevice" srcLNClass="LLN0" srcLNInst="" srcCBName="gse2"/>
                             <ExtRef iedName="s12" srcLDInst="lDevice" srcLNClass="LLN0" srcLNInst="" srcCBName="gse3"/>
                             <ExtRef iedName="s13" lDevice="lDevice" srcLNClass="LLN0" srcLNInst="" srcCBName="gse1"/>
                             <ExtRef iedName="s13" lDevice="lDevice" srcLNClass="LLN0" srcLNInst="" srcCBName="gse2"/>
@@ -915,12 +917,14 @@ export const commScd = `<?xml version="1.0" encoding="UTF-8"?>
                         </ReportControl>
                         <ReportControl name="rp2">
                             <RptEnabled>
-                                <ClientLN iedName="t5"/>
+                                <ClientLN iedName="t5" lnClass="IHMI" lnInst="1" />
+                                <ClientLN iedName="t5" lnClass="ITCI" lnInst="1" />
                             </RptEnabled>
                         </ReportControl>
                         <ReportControl name="rp3">
                             <RptEnabled>
-                                <ClientLN iedName="t5"/>
+								<ClientLN iedName="t5" lnClass="IHMI" lnInst="1" />
+								<ClientLN iedName="t5" lnClass="ITCI" lnInst="1" />
                             </RptEnabled>
                         </ReportControl>
                     </LN0>
