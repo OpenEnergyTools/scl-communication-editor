@@ -1,6 +1,6 @@
 import { fixture, html } from '@open-wc/testing';
 
-import { sendMouse, setViewport } from '@web/test-runner-commands';
+import { sendKeys, sendMouse, setViewport } from '@web/test-runner-commands';
 
 import { visualDiff } from '@web/test-runner-visual-regression';
 
@@ -528,6 +528,56 @@ describe('scl-communication-editor', () => {
 
         await visualDiff(editor, `#25 remove dialog for Report connection`);
       });
+    });
+  });
+
+  describe('has advanced filter options', () => {
+    let editor: SlcCommunicationEditor;
+    beforeEach(async () => {
+      editor = await fixture(
+        html`<scl-communication-editor
+          .doc=${docComm}
+        ></scl-communication-editor>`
+      );
+      div.prepend(editor);
+
+      await setViewport({ width: 1200, height: 800 });
+
+      await sendMouse({ type: 'click', position: [740, 24] });
+    });
+
+    afterEach(async () => {
+      editor.remove();
+    });
+
+    it('on source IED name looks like the latest snapshot', async () => {
+      await editor.updateComplete;
+
+      await sendMouse({ type: 'click', position: [1100, 600] });
+      await sendKeys({ type: 's33' });
+
+      await timeout(200);
+      await visualDiff(editor, `#26 filter source IED name`);
+    });
+
+    it('on source IED name looks like the latest snapshot', async () => {
+      await editor.updateComplete;
+
+      await sendMouse({ type: 'click', position: [1100, 660] });
+      await sendKeys({ type: 't5' });
+
+      await timeout(200);
+      await visualDiff(editor, `#27 filter target IED name`);
+    });
+
+    it('on source IED name looks like the latest snapshot', async () => {
+      await editor.updateComplete;
+
+      await sendMouse({ type: 'click', position: [1100, 740] });
+      await sendKeys({ type: 'gse3' });
+
+      await timeout(200);
+      await visualDiff(editor, `#28 filter control block name`);
     });
   });
 });

@@ -235,7 +235,7 @@ export default class SlcCommunicationEditor extends LitElement {
       <communication-mapping-editor
         .substation=${this.substation}
         .gridSize=${this.gridSize}
-        .links=${[
+        .connections=${[
           ...clientLnConnections(this.substation.ownerDocument),
           ...parseExtRefs(this.substation.ownerDocument),
         ]}

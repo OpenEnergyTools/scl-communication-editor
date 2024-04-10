@@ -4,6 +4,7 @@ import { classMap } from 'lit/directives/class-map.js';
 
 import '@material/mwc-icon-button';
 import '@material/mwc-icon-button-toggle';
+import '@material/mwc-textfield';
 import type { IconButtonToggle } from '@material/mwc-icon-button-toggle';
 
 import { newEditEvent } from '@openscd/open-scd-core';
@@ -31,7 +32,7 @@ export class CommunicationMappingEditor extends LitElement {
   gridSize!: number;
 
   @property({ attribute: false })
-  links: Connection[] = [];
+  connections: Connection[] = [];
 
   @state()
   get ieds(): IED[] {
@@ -54,6 +55,14 @@ export class CommunicationMappingEditor extends LitElement {
   @state() filterRcv = false;
 
   @state() filterSend = false;
+
+  @state() sourceIEDFilter = '';
+
+  @state() targetIEDFilter = '';
+
+  @state() cbNameFilter = '';
+
+  @state() showFilterBox = false;
 
   @state() editMode = false;
 
@@ -178,21 +187,59 @@ export class CommunicationMappingEditor extends LitElement {
     }
   }
 
-  isConnectionFiltered(conn: Connection) {
-    if (!this.selectedIed) return true;
+  filterCbName(conn: Connection): boolean {
+    if (this.cbNameFilter === '') return false;
 
-    if (!this.filterRcv && this.filterSend)
-      return conn.target.ied === this.selectedIed;
+    const terms = this.cbNameFilter.split(' ');
 
-    if (this.filterRcv && !this.filterSend)
-      return conn.source.ied === this.selectedIed;
+    const iedName = conn.source.controlBlock.getAttribute('name')!;
 
-    if (this.filterRcv && this.filterSend) return false;
+    return !terms.some(term => iedName.includes(term));
+  }
 
-    return (
-      conn.source.ied === this.selectedIed ||
-      conn.target.ied === this.selectedIed
-    );
+  filterTargetIED(conn: Connection): boolean {
+    if (this.targetIEDFilter === '') return false;
+
+    const terms = this.targetIEDFilter.split(' ');
+
+    const iedName = conn.target.ied.getAttribute('name')!;
+
+    return !terms.some(term => iedName.includes(term));
+  }
+
+  filterSourceIED(conn: Connection): boolean {
+    if (this.sourceIEDFilter === '') return false;
+
+    const terms = this.sourceIEDFilter.split(' ');
+
+    const iedName = conn.source.ied.getAttribute('name')!;
+
+    return !terms.some(term => iedName.includes(term));
+  }
+
+  filterConnections(conn: Connection) {
+    const service =
+      (conn.source.controlBlock.tagName === 'ReportControl' &&
+        this.filterReport) ||
+      (conn.source.controlBlock.tagName === 'GSEControl' && this.filterGOOSE) ||
+      (conn.source.controlBlock.tagName === 'SampledValueControl' &&
+        this.filterSMV);
+
+    const ied =
+      !!this.selectedIed &&
+      conn.source.ied !== this.selectedIed &&
+      conn.target.ied !== this.selectedIed;
+
+    const source = this.filterSourceIED(conn);
+
+    const target = this.filterTargetIED(conn);
+
+    const cbName = this.filterCbName(conn);
+
+    const receive = this.filterRcv && conn.source.ied === this.selectedIed;
+    const send = this.filterSend && conn.target.ied === this.selectedIed;
+
+    return !(service || ied || source || target || cbName || receive || send);
   }
 
   constructor() {
@@ -314,6 +361,38 @@ export class CommunicationMappingEditor extends LitElement {
       </g></svg>`;
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  renderFilterBox(): TemplateResult {
+    if (!this.showFilterBox) return html``;
+
+    return html`<div class="filter box" style="">
+      <mwc-textfield
+        class="filter input"
+        label="Source IED name"
+        value="${this.sourceIEDFilter}"
+        @input="${(evt: Event) => {
+          this.sourceIEDFilter = (evt.target as HTMLInputElement).value;
+        }}"
+      ></mwc-textfield>
+      <mwc-textfield
+        class="filter input"
+        label="Target IED name"
+        value="${this.targetIEDFilter}"
+        @input="${(evt: Event) => {
+          this.targetIEDFilter = (evt.target as HTMLInputElement).value;
+        }}"
+      ></mwc-textfield>
+      <mwc-textfield
+        class="filter input"
+        label="Control Block name"
+        value="${this.cbNameFilter}"
+        @input="${(evt: Event) => {
+          this.cbNameFilter = (evt.target as HTMLInputElement).value;
+        }}"
+      ></mwc-textfield>
+    </div>`;
+  }
+
   renderService(controlBlock: string): TemplateResult[] {
     return [
       html`<svg viewBox="0 0 25 25" width="25" height="25">
@@ -411,6 +490,14 @@ export class CommunicationMappingEditor extends LitElement {
           this.showLabel = (evt.target as IconButtonToggle).on;
         }}"
       ></mwc-icon-button-toggle>
+      <mwc-icon-button-toggle
+        ?on=${this.showFilterBox}
+        onIcon="filter_list"
+        offIcon="filter_list_off"
+        @click="${(evt: Event) => {
+          this.showFilterBox = (evt.target as IconButtonToggle).on;
+        }}"
+      ></mwc-icon-button-toggle>
     </div>`;
   }
 
@@ -438,20 +525,18 @@ export class CommunicationMappingEditor extends LitElement {
         }} />`
         : nothing;
 
-    const svgConnection = svgConnectionGenerator(this.substation, this.links);
+    const filteredConnections = this.connections.filter(conn =>
+      this.filterConnections(conn)
+    );
+
+    const svgConnection = svgConnectionGenerator(
+      this.substation,
+      filteredConnections
+    );
 
     return html` ${this.renderInfoBox()}
       <div id="container">
         <style>
-          ${this.filterReport
-            ? `svg.connection.ReportControl {display: none}`
-            : nothing}
-          ${this.filterGOOSE
-            ? `svg.connection.GSEControl {display: none} `
-            : nothing}
-          ${this.filterSMV
-            ? `svg.connection.SampledValueControl {display: none} `
-            : nothing}
           ${this.showLabel ? nothing : `.label:not(.ied) {display: none} `}
         </style>
         <svg
@@ -475,11 +560,10 @@ export class CommunicationMappingEditor extends LitElement {
           ${this.ieds.map(ied => this.renderIED(ied))}
           ${this.ieds.map(ied => this.renderLabel(ied.element))}
           ${placingLabelTarget} ${iedPlacingTarget}
-          ${this.links
-            .filter(conn => this.isConnectionFiltered(conn))
-            .map(link => svgConnection(link))}
+          ${filteredConnections.map(link => svgConnection(link))}
         </svg>
-      </div>`;
+      </div>
+      ${this.renderFilterBox()}`;
   }
 
   static styles = css`
@@ -487,6 +571,7 @@ export class CommunicationMappingEditor extends LitElement {
       width: 100%;
       height: 80vh;
       overflow: scroll;
+      background-color: white;
     }
 
     g.equipment {
@@ -523,6 +608,21 @@ export class CommunicationMappingEditor extends LitElement {
       font-family: 'Roboto';
       font-style: normal;
       font-weight: 400;
+    }
+
+    .filter {
+      padding: 10px;
+    }
+
+    .filter.box {
+      width: 250px;
+      height: 230px;
+      position: fixed;
+      bottom: 5px;
+      right: 5px;
+      border: 2px solid;
+      background-color: var(--oscd-theme-base3);
+      border-radius: 5px;
     }
   `;
 }

@@ -30,6 +30,7 @@
     "@material/mwc-button": "^0.27.0",
     "@material/mwc-icon-button": "^0.27.0",
     "@material/mwc-icon-button-toggle": "^0.27.0",
+    "@material/mwc-textfield": "^0.27.0",
     "@openenergytools/scl-lib": "0.9.20",
     "@openenergytools/filterable-lists": "0.0.4",
     "@openscd/open-scd-core": "^0.0.2",
