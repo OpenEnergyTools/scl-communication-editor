@@ -1,28 +1,58 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-return-assign */
-import { css, html, LitElement, TemplateResult } from 'lit';
+import { css, html, LitElement, nothing, TemplateResult } from 'lit';
 import { property, query, state } from 'lit/decorators.js';
 
-import '@material/mwc-dialog';
+import { ScopedElementsMixin } from '@open-wc/scoped-elements/lit-element.js';
+
 import '@material/mwc-button';
-import type { Dialog } from '@material/mwc-dialog';
+import '@material/mwc-icon';
+import '@material/mwc-list';
+import '@material/mwc-list/mwc-list-item';
 
-import { newEditEvent } from '@openscd/open-scd-core';
+import { MdDialog } from '@scopedelement/material-web/dialog/MdDialog.js';
+import { MdIcon } from '@scopedelement/material-web/icon/MdIcon.js';
 
-import '@openenergytools/filterable-lists/dist/action-list.js';
-import type { ActionItem } from '@openenergytools/filterable-lists/dist/action-list.js';
+import { MdTextButton } from '@scopedelement/material-web/button/MdTextButton.js';
+import { MdList } from '@scopedelement/material-web/list/MdList.js';
+import { MdListItem } from '@scopedelement/material-web/list/MdListItem.js';
 
-import { identity, unsubscribe } from '@openenergytools/scl-lib';
+import { newEditEvent } from '@openenergytools/open-scd-core';
 
-import './communication-mapping-editor.js';
+import { ActionList } from '@openenergytools/filterable-lists/dist/ActionList.js';
+import type { ActionItem } from '@openenergytools/filterable-lists/dist/ActionList.js';
+
+import {
+  controlBlockGseOrSmv,
+  identity,
+  unsubscribe,
+} from '@openenergytools/scl-lib';
 
 import { Connection } from './foundation/types.js';
 import {
-  inputReference as inputReferenceHeadline,
+  getExistingSupervision,
+  inputReference,
   inputSupportingText,
+  isSubscribed,
 } from './foundation/utils.js';
 
+import { CommunicationMappingEditor } from './communication-mapping-editor.js';
+import {
+  gseControlPath,
+  iconFromPath,
+  logControlPath,
+  reportControlPath,
+  sampledValueControlPath,
+} from './foundation/icons.js';
+
 type SelectConnectionEvent = CustomEvent<Connection>;
+
+const icons = {
+  LogControl: iconFromPath(logControlPath),
+  ReportControl: iconFromPath(reportControlPath),
+  SampledValueControl: iconFromPath(sampledValueControlPath),
+  GSEControl: iconFromPath(gseControlPath),
+};
 
 function combineSelectors<T>(...selectors: T[][]): string {
   return selectors
@@ -149,10 +179,26 @@ function connectionHeading(conn: Connection): string {
   const sourceIedName = conn.source.ied.getAttribute('name');
   const cbName = conn.source.controlBlock.getAttribute('name');
   const targetIedName = conn.target.ied.getAttribute('name');
-  return `${sourceIedName}:${cbName} ->${targetIedName}`;
+  return `${sourceIedName}:${cbName} ⮕ ${targetIedName}`;
 }
 
-export default class SlcCommunicationEditor extends LitElement {
+export default class SldCommunicationEditor extends ScopedElementsMixin(
+  LitElement
+) {
+  static scopedElements = {
+    'md-icon': MdIcon,
+    'md-dialog': MdDialog,
+    'md-text-button': MdTextButton,
+    'md-list': MdList,
+    'md-list-item': MdListItem,
+    'communication-mapping-editor': CommunicationMappingEditor,
+    'action-list': ActionList,
+    'mwc-button': customElements.get('mwc-button'),
+    'mwc-icon': customElements.get('mwc-icon'),
+    'mwc-list': customElements.get('mwc-list'),
+    'mwc-list-item': customElements.get('mwc-list-item'),
+  };
+
   @property({ attribute: false })
   doc?: XMLDocument;
 
@@ -170,7 +216,7 @@ export default class SlcCommunicationEditor extends LitElement {
   @state()
   selectedConnection?: Connection;
 
-  @query('mwc-dialog') removeSelection!: Dialog;
+  @query('#mappingDetails') mappingDetails!: MdDialog;
 
   removeInputs(inputs: Element[]): void {
     const removeClientLNs = inputs
@@ -193,39 +239,198 @@ export default class SlcCommunicationEditor extends LitElement {
     this.requestUpdate();
   }
 
-  renderRemoveDialog(): TemplateResult {
+  // eslint-disable-next-line class-methods-use-this
+  getCommunicationDetails(connection: Connection | undefined): TemplateResult {
+    if (!connection?.source?.controlBlock)
+      return html`<p>No connection selected</p>`;
+
+    const cb = connection.source.controlBlock;
+    const comm = controlBlockGseOrSmv(cb);
+
+    const vlan = comm?.querySelector(
+      'Address > P[type="VLAN-ID"]'
+    )?.textContent;
+    const vlanPriority = comm?.querySelector(
+      'Address > P[type="VLAN-PRIORITY"]'
+    )?.textContent;
+    const appID = comm?.querySelector('Address > P[type="APPID"]')?.textContent;
+    const macAddress = comm?.querySelector(
+      'Address > P[type="MAC-Address"]'
+    )?.textContent;
+    const minTime = comm?.querySelector('MinTime')?.textContent;
+    const maxTime = comm?.querySelector('MaxTime')?.textContent;
+
+    const dataSet = cb.getAttribute('datSet');
+    const confRev = cb.getAttribute('confRev');
+    const smvID = cb.getAttribute('smvID');
+
+    return html`<table id="comDetails">
+      <tbody>
+        ${smvID
+          ? html`<tr>
+              <td>SMV ID</td>
+              <td>${smvID}</td>
+            </tr>`
+          : null}
+        ${dataSet
+          ? html`<tr>
+              <td>Data Set</td>
+              <td>${dataSet}</td>
+            </tr>`
+          : null}
+        ${confRev
+          ? html`<tr>
+              <td>Configuration Revision</td>
+              <td>${confRev}</td>
+            </tr>`
+          : null}
+        ${vlan
+          ? html`<tr>
+              <td>VLAN ID</td>
+              <td>0x${vlan} (${parseInt(vlan, 16).toString()})</td>
+            </tr>`
+          : null}
+        ${vlanPriority
+          ? html`<tr>
+              <td>VLAN Priority</td>
+              <td>${vlanPriority}</td>
+            </tr>`
+          : null}
+        ${appID
+          ? html`<tr>
+              <td>Application ID</td>
+              <td>${appID}</td>
+            </tr>`
+          : null}
+        ${macAddress
+          ? html`<tr>
+              <td>MAC Address</td>
+              <td>${macAddress}</td>
+            </tr>`
+          : null}
+        ${minTime
+          ? html`<tr>
+              <td>Minimum Time</td>
+              <td>${minTime}</td>
+            </tr>`
+          : null}
+        ${maxTime
+          ? html`<tr>
+              <td>Maximum Time</td>
+              <td>${maxTime}</td>
+            </tr>`
+          : null}
+      </tbody>
+    </table>`;
+  }
+
+  renderSubscription(): TemplateResult {
     const heading = this.selectedConnection
       ? connectionHeading(this.selectedConnection)
       : 'No connection selected';
 
-    const items: ActionItem[] = this.selectedConnection
-      ? this.selectedConnection.target.inputs.map(input => ({
-          headline: inputReferenceHeadline(input),
-          supportingText: inputSupportingText(input),
-        }))
-      : [];
+    const fcdaItems: ActionItem[] = [];
+    const extRefItems: ActionItem[] = [];
 
-    const content = html`<action-list
-      filterable
-      .items=${items}
-    ></action-list>`;
+    this.selectedConnection?.target.inputs
+      .filter(input => isSubscribed(input))
+      .forEach(input => {
+        const fcdaInfo = inputReference(input);
+        const extRefInfo = inputSupportingText(input);
 
-    return html`<mwc-dialog heading="${heading}"
-      >${content}
-      <mwc-button
-        slot="secondaryAction"
-        label="discard"
-        dialogAction="cancel"
-        style="--mdc-theme-primary: var(--oscd-error)"
-      ></mwc-button>
-      <mwc-button
-        slot="primaryAction"
-        label="remove all"
-        icon="link_off"
-        @click="${this.removeAllInputs}"
-        dialogAction="cancel"
-      ></mwc-button
-    ></mwc-dialog>`;
+        fcdaItems.push({
+          headline: fcdaInfo.fcdaRef,
+          supportingText: fcdaInfo.desc,
+          endingIcon: 'arrow_forward',
+        });
+
+        extRefItems.push({
+          headline: extRefInfo.extRefRef,
+          supportingText: extRefInfo.desc,
+        });
+      });
+
+    let supervisionId: string | null = null;
+    let supervisionDesc: string | null = null;
+
+    if (this.selectedConnection) {
+      const { controlBlock } = this.selectedConnection.source;
+      const { ied } = this.selectedConnection.target;
+
+      const supervision = getExistingSupervision(controlBlock, ied);
+
+      if (supervision) {
+        const supervisionType =
+          controlBlock.tagName === 'GSEControl' ? 'LGOS' : 'LSVS';
+        const refSelector =
+          supervisionType === 'LGOS'
+            ? 'DOI[name="GoCBRef"]'
+            : 'DOI[name="SvCBRef"]';
+
+        supervisionDesc =
+          supervision?.getAttribute('desc') ??
+          supervision
+            .querySelector(`:scope > ${refSelector}`)
+            ?.getAttribute('desc') ??
+          null;
+        identity(supervision);
+        supervisionId = `${identity(supervision)}`.substring(
+          ied.getAttribute('name')!.length + 2
+        );
+      }
+    }
+
+    const content = html`<div slot="content">
+      ${supervisionId
+        ? html`<p id="supervisionInfo">
+            <md-icon id="supIcon">monitor_heart</md-icon>Supervision:
+            ${supervisionId}${supervisionDesc
+              ? html` (${supervisionDesc})`
+              : ''}
+          </p>`
+        : null}
+      <details>
+        <summary>Message Information</summary>
+        ${this.getCommunicationDetails(this.selectedConnection)}
+      </details>
+      <div id="lists">
+        <action-list
+          class="vertical-list"
+          .items=${fcdaItems}
+          height="72"
+        ></action-list>
+        <action-list
+          class="vertical-list"
+          .items=${extRefItems}
+          height="72"
+        ></action-list>
+      </div>
+    </div>`;
+
+    const cbType = this.selectedConnection?.source.controlBlock.tagName;
+
+    return html`<md-dialog id="mappingDetails">
+      <div slot="headline">
+        <md-icon>${cbType ? icons[cbType as keyof typeof icons] : ''}</md-icon
+        >${heading}
+      </div>
+      ${content}
+      <div slot="actions">
+        <md-text-button
+          class="warning"
+          @click=${() => {
+            this.removeAllInputs();
+            this.mappingDetails.close();
+          }}
+          >Remove All<md-icon class="warning" slot="icon"
+            >delete_forever</md-icon
+          ></md-text-button
+        >
+        <md-text-button @click=${() => this.mappingDetails.close()}
+          >Close</md-text-button
+        >
+      </div>
+    </md-dialog>`;
   }
 
   render() {
@@ -241,10 +446,10 @@ export default class SlcCommunicationEditor extends LitElement {
         ]}
         @select-connection="${(evt: SelectConnectionEvent) => {
           this.selectedConnection = evt.detail;
-          this.removeSelection.show();
+          this.mappingDetails.show();
         }}"
       ></communication-mapping-editor>
-      ${this.renderRemoveDialog()}
+      ${this.renderSubscription()}
     </main>`;
   }
 
@@ -265,8 +470,81 @@ export default class SlcCommunicationEditor extends LitElement {
       --md-sys-color-on-primary: var(--oscd-base2);
       --md-sys-color-on-surface-variant: var(--oscd-base00);
       --md-menu-container-color: var(--oscd-base3);
-      font-family: var(--oscd-theme-text-font);
       --md-sys-color-surface-container-highest: var(--oscd-base2);
+      --mdc-icon-font: 'Material Symbols Outlined';
+    }
+
+    #mappingDetails {
+      width: auto;
+      max-width: max-content;
+      min-width: min-content;
+    }
+
+    #lists {
+      display: flex;
+    }
+
+    .vertical-list {
+      flex: 1;
+      z-index: 2;
+    }
+
+    .warning {
+      color: var(--oscd-error, red);
+      --md-sys-color-primary: var(--oscd-error, red);
+    }
+
+    .arrow {
+      height: 72px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      padding: 4px;
+    }
+
+    td {
+      padding: 4px 8px;
+      border: 1px solid var(--oscd-base-3, #f9f9f9);
+      text-align: left;
+    }
+
+    tr:nth-child(even) {
+      background-color: var(--oscd-base-2, #f9f9f9);
+    }
+
+    details {
+      margin: 8px;
+    }
+
+    #comDetails {
+      width: auto;
+    }
+
+    #supervisionInfo {
+      display: flex;
+      align-items: center;
+      margin: 0px;
+      border: 0px;
+    }
+
+    #supIcon {
+      display: inline-block;
+      padding: 10px;
+    }
+
+    div[slot='headline'] {
+      padding-top: 12px;
+      padding-left: 12px;
+      padding-bottom: 0px;
+    }
+
+    div[slot='content'] {
+      padding-top: 0px;
+      padding-bottom: 0px;
     }
   `;
 }

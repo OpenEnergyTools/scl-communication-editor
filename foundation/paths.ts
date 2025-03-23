@@ -4,7 +4,7 @@ import { identity } from '@openenergytools/scl-lib';
 
 import { attributes } from './sldUtil.js';
 import { Connection } from './types.js';
-import { inputReference } from './utils.js';
+import { inputReference, inputSupportingText, isSubscribed } from './utils.js';
 
 export const serviceColoring: Record<string, string> = {
   ReportControl: '#859900',
@@ -38,11 +38,22 @@ function tooltip(conn: Connection): string {
   const sourceIed = conn.source.ied.getAttribute('name');
   const targetIed = conn.target.ied.getAttribute('name');
 
-  const data = conn.target.inputs.map(input => inputReference(input));
+  const data = conn.target.inputs
+    .filter(input => isSubscribed(input))
+    .map(input => {
+      const fcdaInfo = inputReference(input);
+      const extRefInfo = inputSupportingText(input);
+
+      return `${fcdaInfo.fcdaRef} ${
+        fcdaInfo.desc ? `(${fcdaInfo.desc})` : ''
+      } --> ${extRefInfo.extRefRef} ${
+        extRefInfo.desc ? `(${extRefInfo.desc})` : ''
+      }`;
+    });
 
   return `${sourceIed}:${cbName} -> ${targetIed}
    
-  \t${data.join('\n\t')}`;
+\t${data.join('\n\t')}`;
 }
 
 function connDimensions(conn: Connection): ConnectionDimensions {

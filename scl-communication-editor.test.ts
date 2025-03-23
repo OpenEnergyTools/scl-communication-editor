@@ -6,7 +6,7 @@ import { visualDiff } from '@web/test-runner-visual-regression';
 
 import { commScd, lNodeConn, scd, ssd } from './testfiles.js';
 
-import SlcCommunicationEditor from './scl-communication-editor.js';
+import SldCommunicationEditor from './scl-communication-editor.js';
 
 const factor = window.process && process.env.CI ? 6 : 3;
 function timeout(ms: number) {
@@ -16,14 +16,14 @@ function timeout(ms: number) {
 }
 mocha.timeout(2000 * factor);
 
-customElements.define('scl-communication-editor', SlcCommunicationEditor);
+customElements.define('scl-communication-editor', SldCommunicationEditor);
 
 const pureSSD = new DOMParser().parseFromString(ssd, 'application/xml');
 const docWithIED = new DOMParser().parseFromString(scd, 'application/xml');
 const docComm = new DOMParser().parseFromString(commScd, 'application/xml');
 const docLNode = new DOMParser().parseFromString(lNodeConn, 'application/xml');
 
-function wheel(editor: SlcCommunicationEditor, type: 'in' | 'out'): void {
+function wheel(editor: SldCommunicationEditor, type: 'in' | 'out'): void {
   const wheelEvent = new WheelEvent('wheel', {
     deltaY: type === 'in' ? 1 : -1,
     screenX: 300,
@@ -48,7 +48,7 @@ describe('scl-communication-editor', () => {
   });
 
   describe('without SCL loaded', () => {
-    let editor: SlcCommunicationEditor;
+    let editor: SldCommunicationEditor;
     beforeEach(async () => {
       editor = await fixture(
         html`<scl-communication-editor></scl-communication-editor>`
@@ -69,7 +69,7 @@ describe('scl-communication-editor', () => {
   });
 
   describe('with pure SSD loaded', () => {
-    let editor: SlcCommunicationEditor;
+    let editor: SldCommunicationEditor;
     beforeEach(async () => {
       editor = await fixture(
         html`<scl-communication-editor
@@ -93,7 +93,7 @@ describe('scl-communication-editor', () => {
   });
 
   describe('in edit mode', () => {
-    let editor: SlcCommunicationEditor;
+    let editor: SldCommunicationEditor;
     beforeEach(async () => {
       editor = await fixture(
         html`<scl-communication-editor
@@ -193,7 +193,7 @@ describe('scl-communication-editor', () => {
 
   describe('with communication services included', () => {
     describe('without any interaction', () => {
-      let editor: SlcCommunicationEditor;
+      let editor: SldCommunicationEditor;
       beforeEach(async () => {
         editor = await fixture(
           html`<scl-communication-editor
@@ -217,7 +217,7 @@ describe('scl-communication-editor', () => {
     });
 
     describe('with move hover over connection', () => {
-      let editor: SlcCommunicationEditor;
+      let editor: SldCommunicationEditor;
       beforeEach(async () => {
         editor = await fixture(
           html`<scl-communication-editor
@@ -245,7 +245,7 @@ describe('scl-communication-editor', () => {
     });
 
     describe('with filtered ReportControl', () => {
-      let editor: SlcCommunicationEditor;
+      let editor: SldCommunicationEditor;
       beforeEach(async () => {
         editor = await fixture(
           html`<scl-communication-editor
@@ -273,7 +273,7 @@ describe('scl-communication-editor', () => {
     });
 
     describe('with filtered GSEControl', () => {
-      let editor: SlcCommunicationEditor;
+      let editor: SldCommunicationEditor;
       beforeEach(async () => {
         editor = await fixture(
           html`<scl-communication-editor
@@ -301,7 +301,7 @@ describe('scl-communication-editor', () => {
     });
 
     describe('with filtered SampledValueControl', () => {
-      let editor: SlcCommunicationEditor;
+      let editor: SldCommunicationEditor;
       beforeEach(async () => {
         editor = await fixture(
           html`<scl-communication-editor
@@ -333,7 +333,7 @@ describe('scl-communication-editor', () => {
   });
 
   describe('has zoom capabilities', () => {
-    let editor: SlcCommunicationEditor;
+    let editor: SldCommunicationEditor;
     beforeEach(async () => {
       editor = await fixture(
         html`<scl-communication-editor
@@ -397,7 +397,7 @@ describe('scl-communication-editor', () => {
   });
 
   describe('with selected IED', () => {
-    let editor: SlcCommunicationEditor;
+    let editor: SldCommunicationEditor;
 
     describe('in a zero line view', () => {
       beforeEach(async () => {
@@ -502,7 +502,7 @@ describe('scl-communication-editor', () => {
   });
 
   describe('allows to disable equipment labels', () => {
-    let editor: SlcCommunicationEditor;
+    let editor: SldCommunicationEditor;
     beforeEach(async () => {
       editor = await fixture(
         html`<scl-communication-editor
@@ -530,7 +530,7 @@ describe('scl-communication-editor', () => {
 
   describe('has a remove connection dialog', () => {
     describe('with connection click', () => {
-      let editor: SlcCommunicationEditor;
+      let editor: SldCommunicationEditor;
       beforeEach(async () => {
         editor = await fixture(
           html`<scl-communication-editor
@@ -571,7 +571,7 @@ describe('scl-communication-editor', () => {
   });
 
   describe('has advanced filter options', () => {
-    let editor: SlcCommunicationEditor;
+    let editor: SldCommunicationEditor;
     beforeEach(async () => {
       editor = await fixture(
         html`<scl-communication-editor

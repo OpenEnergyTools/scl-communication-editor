@@ -1,6 +1,8 @@
 import { LitElement, nothing, css, html, svg, TemplateResult } from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
+import { property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+
+import { ScopedElementsMixin } from '@open-wc/scoped-elements/lit-element.js';
 
 import '@material/mwc-button';
 import '@material/mwc-icon-button';
@@ -10,7 +12,7 @@ import '@material/mwc-fab';
 import '@material/mwc-textfield';
 import type { IconButtonToggle } from '@material/mwc-icon-button-toggle';
 
-import { newEditEvent } from '@openscd/open-scd-core';
+import { newEditEvent } from '@openenergytools/open-scd-core';
 
 import { identity } from '@openenergytools/scl-lib';
 
@@ -26,8 +28,17 @@ import {
 import { serviceColoring, svgConnectionGenerator } from './foundation/paths.js';
 import { IED, Connection } from './foundation/types.js';
 
-@customElement('communication-mapping-editor')
-export class CommunicationMappingEditor extends LitElement {
+export class CommunicationMappingEditor extends ScopedElementsMixin(
+  LitElement
+) {
+  static scopedElements = {
+    'mwc-fab': customElements.get('mwc-fab'),
+    'mwc-textfield': customElements.get('mwc-textfield'),
+    'mwc-button': customElements.get('mwc-button'),
+    'mwc-icon-button': customElements.get('mwc-icon-button'),
+    'mwc-icon-button-toggle': customElements.get('mwc-icon-button-toggle'),
+  };
+
   @property({ attribute: false })
   substation!: Element;
 

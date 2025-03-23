@@ -4,16 +4,16 @@ import { sendMouse, setViewport } from '@web/test-runner-commands';
 
 import { SinonSpy, spy } from 'sinon';
 
-import { Edit, isRemove, isUpdate } from '@openscd/open-scd-core';
+import { Edit, isRemove, isUpdate } from '@openenergytools/open-scd-core';
 
 import { commScd, scd } from './testfiles.js';
 
-import SlcCommunicationEditor from './scl-communication-editor.js';
+import SldCommunicationEditor from './scl-communication-editor.js';
 
 const docWithIED = new DOMParser().parseFromString(scd, 'application/xml');
 const docComm = new DOMParser().parseFromString(commScd, 'application/xml');
 
-customElements.define('scl-communication-editor', SlcCommunicationEditor);
+customElements.define('scl-communication-editor', SldCommunicationEditor);
 
 const sldURI = 'https://transpower.co.nz/SCL/SSD/SLD/v0';
 
@@ -26,7 +26,7 @@ function timeout(ms: number) {
 mocha.timeout(2000 * factor);
 
 describe('scl-communication-editor', () => {
-  let editor: SlcCommunicationEditor;
+  let editor: SldCommunicationEditor;
 
   describe('allow to move IED and IEd labels around', () => {
     let editEvent: SinonSpy;
