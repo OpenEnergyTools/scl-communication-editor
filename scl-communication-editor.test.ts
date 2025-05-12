@@ -32,7 +32,7 @@ function wheel(editor: SlcCommunicationEditor, type: 'in' | 'out'): void {
   });
 
   editor.shadowRoot
-    ?.querySelector('communication-mapping-editor')
+    ?.querySelector('communication-scl-editor')
     ?.dispatchEvent(wheelEvent);
 }
 
@@ -103,7 +103,7 @@ describe('scl-communication-editor', () => {
       div.prepend(editor);
 
       await setViewport({ width: 800, height: 600 });
-      await sendMouse({ type: 'click', position: [550, 24] });
+      await sendMouse({ type: 'click', position: [530, 30] });
     });
 
     afterEach(async () => {
@@ -119,8 +119,8 @@ describe('scl-communication-editor', () => {
     it('clicked on an IED looks like the latest snapshot', async () => {
       await editor.updateComplete;
 
-      await sendMouse({ type: 'move', position: [150, 200] });
-      await sendMouse({ type: 'click', position: [150, 200] });
+      await sendMouse({ type: 'move', position: [150, 190] });
+      await sendMouse({ type: 'click', position: [150, 190] });
 
       await timeout(200);
       await visualDiff(editor, `#4 clicked on an IED`);
@@ -129,10 +129,10 @@ describe('scl-communication-editor', () => {
     it('clicked and moved an IED looks like the latest snapshot', async () => {
       await editor.updateComplete;
 
-      await sendMouse({ type: 'move', position: [150, 200] });
-      await sendMouse({ type: 'click', position: [150, 200] });
+      await sendMouse({ type: 'move', position: [150, 190] });
+      await sendMouse({ type: 'click', position: [150, 190] });
 
-      await sendMouse({ type: 'move', position: [150, 170] });
+      await sendMouse({ type: 'move', position: [150, 160] });
 
       await timeout(200);
 
@@ -142,11 +142,11 @@ describe('scl-communication-editor', () => {
     it('release selected IED looks like the latest snapshot', async () => {
       await editor.updateComplete;
 
-      await sendMouse({ type: 'move', position: [150, 200] });
-      await sendMouse({ type: 'click', position: [150, 200] });
+      await sendMouse({ type: 'move', position: [150, 190] });
+      await sendMouse({ type: 'click', position: [150, 190] });
 
-      await sendMouse({ type: 'move', position: [150, 170] });
-      await sendMouse({ type: 'click', position: [150, 170] });
+      await sendMouse({ type: 'move', position: [150, 160] });
+      await sendMouse({ type: 'click', position: [150, 160] });
 
       await timeout(200);
 
@@ -352,7 +352,7 @@ describe('scl-communication-editor', () => {
     it('on zoom in button click looks like the latest snapshot', async () => {
       await editor.updateComplete;
 
-      await sendMouse({ type: 'click', position: [600, 24] });
+      await sendMouse({ type: 'click', position: [580, 24] });
 
       await timeout(200);
       await visualDiff(editor, `#15 on zoom in button`);
@@ -361,7 +361,7 @@ describe('scl-communication-editor', () => {
     it('on zoom out button click looks like the latest snapshot', async () => {
       await editor.updateComplete;
 
-      await sendMouse({ type: 'click', position: [650, 24] });
+      await sendMouse({ type: 'click', position: [630, 24] });
 
       await timeout(200);
       await visualDiff(editor, `#16 on zoom out button`);
@@ -484,7 +484,7 @@ describe('scl-communication-editor', () => {
       it('and BCU selected selected looks like the latest snapshot', async () => {
         await editor.updateComplete;
 
-        await sendMouse({ type: 'click', position: [270, 175] });
+        await sendMouse({ type: 'click', position: [270, 150] });
 
         await timeout(200);
         await visualDiff(editor, `#31 BCU selected`);
@@ -493,7 +493,7 @@ describe('scl-communication-editor', () => {
       it('and MU selected selected looks like the latest snapshot', async () => {
         await editor.updateComplete;
 
-        await sendMouse({ type: 'click', position: [270, 368] });
+        await sendMouse({ type: 'click', position: [270, 330] });
 
         await timeout(200);
         await visualDiff(editor, `#32 MU selected`);
@@ -521,7 +521,7 @@ describe('scl-communication-editor', () => {
     it('looks like the latest snapshot', async () => {
       await editor.updateComplete;
 
-      await sendMouse({ type: 'click', position: [690, 24] });
+      await sendMouse({ type: 'click', position: [660, 24] });
 
       await timeout(200);
       await visualDiff(editor, `#23 allows to disable equipment labels`);
@@ -560,7 +560,7 @@ describe('scl-communication-editor', () => {
       it('for ClientLNs type inputs looks like the latest snapshot', async () => {
         await editor.updateComplete;
 
-        await sendMouse({ type: 'click', position: [473, 432] });
+        await sendMouse({ type: 'click', position: [516, 424] });
 
         await editor.updateComplete;
         await timeout(200);

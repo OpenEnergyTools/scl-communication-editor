@@ -43,7 +43,7 @@ describe('scl-communication-editor', () => {
 
       document.body.append(editor);
 
-      await sendMouse({ type: 'click', position: [550, 24] });
+      await sendMouse({ type: 'click', position: [530, 30] });
     });
 
     afterEach(() => editor.remove());
@@ -141,12 +141,12 @@ describe('scl-communication-editor', () => {
       it('for ClientLNs type inputs looks like the latest snapshot', async () => {
         await editor.updateComplete;
 
-        await sendMouse({ type: 'click', position: [516, 440] });
+        await sendMouse({ type: 'click', position: [516, 432] });
 
         await editor.updateComplete;
         await timeout(200);
 
-        await sendMouse({ type: 'click', position: [649, 543] });
+        await sendMouse({ type: 'click', position: [660, 560] });
 
         expect(editEvent).to.have.been.calledOnce;
         const edits = editEvent.args[0][0].detail;

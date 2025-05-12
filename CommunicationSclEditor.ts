@@ -1,14 +1,13 @@
 import { LitElement, nothing, css, html, svg, TemplateResult } from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
+import { property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 
-import '@material/mwc-button';
-import '@material/mwc-icon-button';
-import '@material/mwc-icon-button-toggle';
-// eslint-disable-next-line import/no-extraneous-dependencies
-import '@material/mwc-fab';
-import '@material/mwc-textfield';
-import type { IconButtonToggle } from '@material/mwc-icon-button-toggle';
+import { ScopedElementsMixin } from '@open-wc/scoped-elements/lit-element.js';
+
+import { MdFab } from '@scopedelement/material-web/fab/MdFab.js';
+import { MdIcon } from '@scopedelement/material-web/icon/MdIcon.js';
+import { MdIconButton } from '@scopedelement/material-web/iconbutton/MdIconButton.js';
+import { MdOutlinedTextField } from '@scopedelement/material-web/textfield/MdOutlinedTextField.js';
 
 import { newEditEvent } from '@openscd/open-scd-core';
 
@@ -26,8 +25,14 @@ import {
 import { serviceColoring, svgConnectionGenerator } from './foundation/paths.js';
 import { IED, Connection } from './foundation/types.js';
 
-@customElement('communication-mapping-editor')
-export class CommunicationMappingEditor extends LitElement {
+export class CommunicationSclEditor extends ScopedElementsMixin(LitElement) {
+  static scopedElements = {
+    'md-fab': MdFab,
+    'md-icon': MdIcon,
+    'md-outlined-textfield': MdOutlinedTextField,
+    'md-icon-button': MdIconButton,
+  };
+
   @property({ attribute: false })
   substation!: Element;
 
@@ -405,57 +410,59 @@ export class CommunicationMappingEditor extends LitElement {
       <h3 class="filter title">
         Filter connections
         <nav style="float: right;">
-          <mwc-icon-button
-            icon="close"
+          <md-icon-button
             @click="${() => {
               this.showFilterBox = false;
             }}"
-          ></mwc-icon-button>
+          >
+            <md-icon>close</md-icon>
+          </md-icon-button>
         </nav>
       </h3>
-      <mwc-textfield
+      <md-outlined-textfield
         label="Source IED name"
         value="${this.sourceIEDFilter}"
         @input="${(evt: Event) => {
           this.sourceIEDFilter = (evt.target as HTMLInputElement).value;
         }}"
-      ></mwc-textfield>
-      <mwc-textfield
+      ></md-outlined-textfield>
+      <md-outlined-textfield
         label="Target IED name"
         value="${this.targetIEDFilter}"
         @input="${(evt: Event) => {
           this.targetIEDFilter = (evt.target as HTMLInputElement).value;
         }}"
-      ></mwc-textfield>
-      <mwc-textfield
+      ></md-outlined-textfield>
+      <md-outlined-textfield
         label="Control Block name"
         value="${this.cbNameFilter}"
         @input="${(evt: Event) => {
           this.cbNameFilter = (evt.target as HTMLInputElement).value;
         }}"
-      ></mwc-textfield>
+      ></md-outlined-textfield>
     </div>`;
   }
 
   renderFilterFab(): TemplateResult {
     return html`<nav class="filter button">
       ${this.activeFilter()
-        ? html`<mwc-fab
+        ? html`<md-fab
             class="filter refresh"
             style="padding-right: 10px;"
-            extended
-            icon="refresh"
             label="Clear"
             @click="${() => {
               this.clearFilter();
             }}"
-          ></mwc-fab>`
-        : nothing}<mwc-fab
-        icon="filter_alt"
+            ><md-icon slot="icon">refresh</md-icon>
+          </md-fab>`
+        : nothing}
+      <md-fab
         @click="${() => {
           this.showFilterBox = true;
         }}"
-      ></mwc-fab>
+      >
+        <md-icon slot="icon">filter_alt</md-icon>
+      </md-fab>
     </nav>`;
   }
 
@@ -521,25 +528,30 @@ export class CommunicationMappingEditor extends LitElement {
               }}"
             />`
         : nothing}
-      <mwc-icon-button-toggle
-        ?on=${this.editMode}
-        onIcon="edit"
-        offIcon="edit_off"
+      <md-icon-button
+        ?selected=${this.editMode}
         @click="${(evt: Event) => {
-          this.editMode = (evt.target as IconButtonToggle).on;
+          this.editMode = !(
+            (evt.target as HTMLElement).closest(
+              'md-icon-button'
+            ) as MdIconButton
+          ).selected;
           this.resetIedSelection();
         }}"
-      ></mwc-icon-button-toggle>
-      <mwc-icon-button
+      >
+        <md-icon>edit_off</md-icon>
+        <md-icon slot="selected">edit</md-icon>
+      </md-icon-button>
+      <md-icon-button
         class="zoom"
-        icon="zoom_in"
         title="Zoom in"
         @click="${() => {
           this.gridSize += 4;
         }}"
       >
-      </mwc-icon-button>
-      <mwc-icon-button
+        <md-icon>zoom_in</md-icon>
+      </md-icon-button>
+      <md-icon-button
         class="zoom"
         icon="zoom_out"
         title="Zoom out"
@@ -547,15 +559,21 @@ export class CommunicationMappingEditor extends LitElement {
           this.gridSize -= 4;
         }}"
       >
-      </mwc-icon-button>
-      <mwc-icon-button-toggle
-        ?on=${this.showLabel}
-        onIcon="font_download"
-        offIcon="font_download_off"
+        <md-icon>zoom_out</md-icon>
+      </md-icon-button>
+      <md-icon-button
+        ?selected=${this.showLabel}
         @click="${(evt: Event) => {
-          this.showLabel = (evt.target as IconButtonToggle).on;
+          this.showLabel = !(
+            (evt.target as HTMLElement).closest(
+              'md-icon-button'
+            ) as MdIconButton
+          ).selected;
         }}"
-      ></mwc-icon-button-toggle>
+      >
+        <md-icon>font_download_off</md-icon>
+        <md-icon slot="selected">font_download</md-icon>
+      </md-icon-button>
     </div>`;
   }
 
@@ -673,7 +691,7 @@ export class CommunicationMappingEditor extends LitElement {
       font-weight: 400;
     }
 
-    .filter.box > mwc-textfield {
+    .filter.box > md-outlined-textfield {
       padding: 10px;
     }
 
