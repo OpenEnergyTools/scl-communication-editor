@@ -1,20 +1,21 @@
-/* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable no-return-assign */
 import { css, html, LitElement, TemplateResult } from 'lit';
 import { property, query, state } from 'lit/decorators.js';
 
-import '@material/mwc-dialog';
-import '@material/mwc-button';
-import type { Dialog } from '@material/mwc-dialog';
+import { ScopedElementsMixin } from '@open-wc/scoped-elements/lit-element.js';
+
+import { MdDialog } from '@scopedelement/material-web/dialog/MdDialog.js';
+import { MdTextButton } from '@scopedelement/material-web/button/MdTextButton.js';
+
+import {
+  ActionItem,
+  ActionList,
+} from '@openenergytools/filterable-lists/dist/ActionList.js';
 
 import { newEditEvent } from '@openscd/open-scd-core';
 
-import '@openenergytools/filterable-lists/dist/action-list.js';
-import type { ActionItem } from '@openenergytools/filterable-lists/dist/action-list.js';
-
 import { identity, unsubscribe } from '@openenergytools/scl-lib';
 
-import './communication-mapping-editor.js';
+import { CommunicationSclEditor } from './CommunicationSclEditor.js';
 
 import { Connection } from './foundation/types.js';
 import {
@@ -152,7 +153,16 @@ function connectionHeading(conn: Connection): string {
   return `${sourceIedName}:${cbName} ->${targetIedName}`;
 }
 
-export default class SlcCommunicationEditor extends LitElement {
+export default class SlcCommunicationEditor extends ScopedElementsMixin(
+  LitElement
+) {
+  static scopedElements = {
+    'communication-scl-editor': CommunicationSclEditor,
+    'md-dialog': MdDialog,
+    'action-list': ActionList,
+    'md-text-button': MdTextButton,
+  };
+
   @property({ attribute: false })
   doc?: XMLDocument;
 
@@ -170,7 +180,7 @@ export default class SlcCommunicationEditor extends LitElement {
   @state()
   selectedConnection?: Connection;
 
-  @query('mwc-dialog') removeSelection!: Dialog;
+  @query('md-dialog') removeSelection!: MdDialog;
 
   removeInputs(inputs: Element[]): void {
     const removeClientLNs = inputs
@@ -206,33 +216,39 @@ export default class SlcCommunicationEditor extends LitElement {
       : [];
 
     const content = html`<action-list
+      style="min-width: min-content;"
       filterable
       .items=${items}
     ></action-list>`;
 
-    return html`<mwc-dialog heading="${heading}"
-      >${content}
-      <mwc-button
-        slot="secondaryAction"
-        label="discard"
-        dialogAction="cancel"
-        style="--mdc-theme-primary: var(--oscd-error)"
-      ></mwc-button>
-      <mwc-button
-        slot="primaryAction"
-        label="remove all"
-        icon="link_off"
-        @click="${this.removeAllInputs}"
-        dialogAction="cancel"
-      ></mwc-button
-    ></mwc-dialog>`;
+    return html`<md-dialog>
+      <div slot="headline">${heading}</div>
+      <form slot="content" id="form-id" method="dialog">${content}</form>
+      <div slot="actions">
+        <md-text-button
+          style="--mdc-theme-primary: var(--oscd-error)"
+          @click="${() => {
+            this.removeSelection.close();
+          }}"
+          >discard</md-text-button
+        >
+        <md-text-button
+          @click="${() => {
+            this.removeSelection.close();
+            this.removeAllInputs();
+          }}"
+        >
+          remove all
+        </md-text-button>
+      </div>
+    </md-dialog>`;
   }
 
   render() {
     if (!this.substation) return html`<main>No substation section</main>`;
 
     return html`<main>
-      <communication-mapping-editor
+      <communication-scl-editor
         .substation=${this.substation}
         .gridSize=${this.gridSize}
         .connections=${[
@@ -243,7 +259,7 @@ export default class SlcCommunicationEditor extends LitElement {
           this.selectedConnection = evt.detail;
           this.removeSelection.show();
         }}"
-      ></communication-mapping-editor>
+      ></communication-scl-editor>
       ${this.renderRemoveDialog()}
     </main>`;
   }
@@ -254,11 +270,15 @@ export default class SlcCommunicationEditor extends LitElement {
       height: 100%;
     }
 
+    md-dialog {
+      --md-dialog-container-max-height: 100%;
+      --md-dialog-container-max-width: 100%;
+    }
+
     * {
       --md-sys-color-primary: var(--oscd-primary);
       --md-sys-color-secondary: var(--oscd-secondary);
       --md-sys-typescale-body-large-font: var(--oscd-theme-text-font);
-      --md-outlined-text-field-input-text-color: var(--oscd-base01);
 
       --md-sys-color-surface: var(--oscd-base3);
       --md-sys-color-on-surface: var(--oscd-base00);
@@ -267,6 +287,7 @@ export default class SlcCommunicationEditor extends LitElement {
       --md-menu-container-color: var(--oscd-base3);
       font-family: var(--oscd-theme-text-font);
       --md-sys-color-surface-container-highest: var(--oscd-base2);
+      --md-fab-container-color: var(--oscd-secondary);
     }
   `;
 }
