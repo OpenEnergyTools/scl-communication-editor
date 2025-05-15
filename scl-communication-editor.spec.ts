@@ -51,13 +51,21 @@ describe('scl-communication-editor', () => {
     it('release selected IED looks like the latest snapshot', async () => {
       await editor.updateComplete;
 
+      console.log('1-begin');
       await sendMouse({ type: 'move', position: [150, 200] });
       await sendMouse({ type: 'click', position: [150, 200] });
+
+      console.log('1-mode IED');
 
       await sendMouse({ type: 'move', position: [150, 170] });
       await sendMouse({ type: 'click', position: [150, 170] });
 
+      console.log('1-release IED');
+
       expect(editEvent).to.have.been.calledOnce;
+
+      console.log('1-event correct');
+
       const edit = editEvent.args[0][0];
       expect(edit.detail).to.satisfy(isUpdate);
       expect(edit.detail.element.tagName).to.equal('IED');
@@ -83,6 +91,8 @@ describe('scl-communication-editor', () => {
       await sendMouse({ type: 'click', position: [180, 165] });
 
       expect(editEvent).to.have.been.calledOnce;
+
+      console.log('2-event correct');
       const edit = editEvent.args[0][0];
       expect(edit.detail).to.satisfy(isUpdate);
       expect(edit.detail.element.tagName).to.equal('IED');
@@ -130,6 +140,8 @@ describe('scl-communication-editor', () => {
 
         expect(editEvent).to.have.been.calledOnce;
 
+        console.log('3-event correct');
+
         const edits = editEvent.args[0][0].detail;
         expect(edits.length).to.equal(3);
 
@@ -149,6 +161,9 @@ describe('scl-communication-editor', () => {
         await sendMouse({ type: 'click', position: [660, 560] });
 
         expect(editEvent).to.have.been.calledOnce;
+
+        console.log('4-event correct');
+
         const edits = editEvent.args[0][0].detail;
 
         expect(edits.length).to.equal(2);
